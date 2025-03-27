@@ -1,20 +1,17 @@
 # main.py
 
 from logger.logger import LoggerFactory
+from ui.main_ui import launch_ui
 
 
 def main():
     """
     Entry point for the application.
-    Initializes a logger and logs messages at various levels.
+    Initializes a logger and starts the UI.
     """
     logger = LoggerFactory(name="TVGApp").get_logger()
-
-    logger.debug("This is a DEBUG message.")
-    logger.info("This is an INFO message.")
-    logger.warning("This is a WARNING message.")
-    logger.error("This is an ERROR message.")
-    logger.critical("This is a CRITICAL message.")
+    logger.info("Starting the TVG Planet Generator UI...")
+    launch_ui()
 
 
 if __name__ == "__main__":

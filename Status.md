@@ -7,18 +7,15 @@ This file is intended to help ChatGPT (and me) remember where we are in the proj
 ---
 
 ## Daily Commit Summaries
+ 
+- 2025.03.26: Rebuilt the icosphere generator, and pre-elevation modification steps with object-oriented code, and better logging.
+- 2025.03.27: Shrunk save-file sizes.
 
 ---
 
 ## In-Progress
 
-### 💾 Mesh Storage & Querying
-
-- [ ] Design and implement a `PlanetMesh` class to hold:
-  - Vertices, faces, face geometry, adjacency
-  - Spatial query helpers (by face index, lat/lon, center proximity)
-
-We implemented file saving and loading via pickle, but it was slow with large files. We decided to switch our lists to numpy arrays and successfully updated face_geometry.py. We still need to update planet_mesh.py to use numpy arrays where possible, and then update generate_planet.py to use the new numpy arrays as parameters instead of the old lists.
+Build basic UI and visualizer.
 
 ---
 
@@ -26,7 +23,7 @@ We implemented file saving and loading via pickle, but it was slow with large fi
 
 ### 💾 Mesh Storage & Querying
 
-- [ ] Design and implement a `PlanetMesh` class to hold:
+- [x] Design and implement a `PlanetMesh` class to hold:
   - Vertices, faces, face geometry, adjacency
   - Spatial query helpers (by face index, lat/lon, center proximity)
 - [ ] Build support for extracting local face groups (e.g. 7-tile hex rings)
@@ -75,37 +72,53 @@ We implemented file saving and loading via pickle, but it was slow with large fi
 ## File & Folder Structure
 ```
 tvg/
-├── .venv/                      # Virtual environment (auto-managed by PyCharm)
+├── .venv/                          # Virtual environment (auto-managed by PyCharm)
 │
 ├── gamedata/
-│   ├── planets/                # Storage for planet objects
+│   ├── planets/                    # Storage for planet objects
 │
-├── logger/                     # Centralized logging tools
-│   ├── __init__.py             # Marks as a package
-│   └── logger.py               # LoggerFactory with color output and rotating file handler
+├── logger/                         # Centralized logging tools
+│   ├── __init__.py                 # Marks as a package
+│   └── logger.py                   # LoggerFactory with color output and rotating file handler
 │
-├── logs/                       # Auto-created directory for logs
-│   └── tvg.log                 # Output file for logs (rotated based on config)
+├── logs/                           # Auto-created directory for logs
+│   └── tvg.log                     # Output file for logs (rotated based on config)
 │
-├── planet_generator/           # Main planetary generation module
-│   ├── geometry/               # Planetary mesh generation and spatial data
-│   │   ├── __init__.py         # Marks as a package
-│   │   ├── adjacency.py        # Calculates which faces share edges
-│   │   ├── face_geometry.py    # Computes face centers, normals, area, slope, and lat/lon
-│   │   └── icosphere.py        # Builds and subdivides an icosahedral sphere mesh
+├── planet_generator/               # Main planetary generation module
+│   ├── geometry/                   # Planetary mesh generation and spatial data
+│   │   ├── __init__.py             # Marks as a package
+│   │   ├── adjacency.py            # Calculates which faces share edges
+│   │   ├── face_geometry.py        # Computes face centers, normals, area, slope, and lat/lon
+│   │   └── icosphere.py            # Builds and subdivides an icosahedral sphere mesh
 │   │
-│   ├── planet_utils/           # Shared utility methods for geometry/topology
-│   │   ├── __init__.py         # Marks as a package
-│   │   └── mesh_tools.py       # Mesh inspection tools (e.g. vertex distance checks)
+│   ├── planet_utils/               # Shared utility methods for geometry/topology
+│   │   ├── __init__.py             # Marks as a package
+│   │   └── mesh_tools.py           # Mesh inspection tools (e.g. vertex distance checks)
 │   │
-│   ├── __init__.py             # Marks as a package
-│   ├── generate_planet.py      # Orchestrates full generation process
-│   └── planet_config.py        # User-editable settings for world generation
+│   ├── __init__.py                 # Marks as a package
+│   ├── generate_planet.py          # Orchestrates full generation process
+│   └── planet_config.py            # User-editable settings for world generation
 │
-├── __init__.py                 # Marks the root folder as a Python package
-├── config.py                   # Global logging configuration (used across modules)
-├── main.py                     # Entry point for launching the application
-└── Status.md                   # Project planning, notes, and developer checklist
+├── ui/                             # UI package for all interface logic
+│   ├── components/                 # Reusable widgets (e.g., log viewer, sliders)
+│   │   ├── __init__.py
+│   │   ├── labeled_entry.py        # Reusable labeled field for numeric/text input
+│   │   └── log_console.py          # Tkinter log display linked to logger
+│   │
+│   ├── screens/                    # Individual screens/views (e.g. welcome, settings)
+│   │   ├── __init__.py
+│   │   ├── planetgen_screen.py     # Planet generation controls and mesh preview
+│   │   ├── settings_screen.py      # Optional future settings UI
+│   │   └── welcome_screen.py       # New Game, Load, Settings menu
+│   │
+│   ├── __init__.py
+│   ├── main_ui.py                  # Entry point for all UI logic
+│   └── state_manager.py            # Handles screen switching, shared app state
+│
+├── __init__.py                     # Marks the root folder as a Python package
+├── config.py                       # Global logging configuration (used across modules)
+├── main.py                         # Starts the UI (calls ui.main_ui)
+└── Status.md                       # Project planning, notes, and developer checklist
 ```
 
 ---

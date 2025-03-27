@@ -7,6 +7,7 @@ from planet_generator.geometry.face_geometry import compute_face_geometry
 from planet_generator.planet_utils.mesh_tools import validate_vertex_distances, summarize_mesh_geometry
 from planet_generator.planet_mesh import PlanetMesh
 from logger.logger import LoggerFactory
+import argparse
 import os
 
 
@@ -14,13 +15,20 @@ def main():
     """
     Entry point for procedural planet generation.
     Initializes config, logger, and starts mesh generation with debug info.
+    Accepts optional command-line arguments for radius and subdivisions.
+    If not provided, values from PLANET_CONFIG are used.
     """
+    parser = argparse.ArgumentParser(description="TVG Planet Generator")
+    parser.add_argument("--radius", type=float, help="Planet radius in kilometers")
+    parser.add_argument("--subdivisions", type=int, help="Icosphere subdivision level")
+    args = parser.parse_args()
+
     logger = LoggerFactory("PlanetGen").get_logger()
     logger.info("Starting planet generation...")
 
-    # Step 1: Load config values
-    radius = PLANET_CONFIG.get("planet_radius")
-    subdivisions = PLANET_CONFIG.get("subdivisions")
+    # Step 1: Load config values from CLI or fallback to planet_config.py
+    radius = args.radius if args.radius is not None else PLANET_CONFIG.get("planet_radius")
+    subdivisions = args.subdivisions if args.subdivisions is not None else PLANET_CONFIG.get("subdivisions")
 
     logger.info(f"Planet radius: {radius:,} km")
     logger.info(f"Icosphere subdivisions: {subdivisions:,}")
@@ -69,8 +77,6 @@ def main():
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     save_path = os.path.join(root_dir, "gamedata", "planets", "planet_test.mesh")
     mesh.save(save_path)
-    mesh2 = PlanetMesh.load(save_path)
-    mesh2.verify_pentagon_vertices()
 
 
 if __name__ == "__main__":
