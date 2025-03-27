@@ -102,10 +102,10 @@ class PlanetMesh:
         Automatically creates the parent directory if it doesn't exist.
         """
         import os
-        import pickle
+        import joblib
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, "wb") as f:
-            pickle.dump(self, f)
+            joblib.dump(self, f, compress=3)
         self.logger.info(f"PlanetMesh saved to {filepath}")
 
     @staticmethod
@@ -113,11 +113,15 @@ class PlanetMesh:
         """
         Loads a mesh object from a binary file using pickle.
         """
-        import pickle
+        import joblib
         with open(filepath, "rb") as f:
-            mesh = pickle.load(f)
+            mesh = joblib.load(f)
         mesh.logger.info(f"PlanetMesh loaded from {filepath}")
         return mesh
 
     # TODO: Add lat/lon spatial queries
     # TODO: Add vertex-to-face index mapping for expansion
+    # TODO: Break PlanetMesh saving into folder-based format:
+    #       - Separate .npy/.npz files for vertices, faces, face_geometry
+    #       - Separate adjacency, metadata, and cache as needed
+    #       - Enable lazy loading of mesh subsets
