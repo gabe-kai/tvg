@@ -9,6 +9,7 @@ import os
 from planet_generator.planet_mesh import PlanetMesh
 
 class PlanetViewerFrame(tk.Frame):
+    viewer_thread = None  # Class-level reference to track the running viewer
     """
     Embeds a 3D OpenGL-rendered preview of the planet mesh.
     Uses moderngl-window to load and display a spinning icosphere mesh.
@@ -24,10 +25,18 @@ class PlanetViewerFrame(tk.Frame):
         self.after(100, self._start_viewer_thread)
 
     def _start_viewer_thread(self):
+        # Prevent multiple viewer threads from running
+        if PlanetViewerFrame.viewer_thread and PlanetViewerFrame.viewer_thread.is_alive():
+            print("[PlanetViewerFrame] Viewer already running — skipping launch.")
+            return
+
         thread = threading.Thread(target=self._launch_opengl_viewer, daemon=True)
+        PlanetViewerFrame.viewer_thread = thread
         thread.start()
 
     def _launch_opengl_viewer(self):
+        import os
+        os.environ["MODERNGL_WINDOW"] = "glfw"
         try:
             mesh = PlanetMesh.load(self.mesh_file_path)
             PlanetMeshPreviewer.mesh_data = mesh

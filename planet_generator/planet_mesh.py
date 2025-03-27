@@ -98,7 +98,7 @@ class PlanetMesh:
 
     def save(self, filepath: str) -> None:
         """
-        Saves the mesh object to a binary file using pickle.
+        Saves the mesh object to a binary file using joblib.
         Automatically creates the parent directory if it doesn't exist.
         """
         import os
@@ -111,7 +111,7 @@ class PlanetMesh:
     @staticmethod
     def load(filepath: str) -> "PlanetMesh":
         """
-        Loads a mesh object from a binary file using pickle.
+        Loads a mesh object from a binary file using joblib.
         """
         import joblib
         with open(filepath, "rb") as f:
