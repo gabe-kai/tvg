@@ -9,17 +9,13 @@ This file is intended to help ChatGPT (and me) remember where we are in the proj
 ## Daily Commit Summaries
  
 - 2025.03.26: Rebuilt the icosphere generator, and pre-elevation modification steps with object-oriented code, and better logging.
-- 2025.03.27: Shrunk save-file sizes.
+- 2025.03.27: Implemented save-files for the Planet object. Implemented a basic UI for planet generation and viewing.
 
 ---
 
 ## In-Progress
 
 Build basic UI and visualizer.
-
----
-
-## ToDo
 
 ### 💾 Mesh Storage & Querying
 
@@ -32,14 +28,18 @@ Build basic UI and visualizer.
 
 ### 🖥️ UI + Visualization
 
-- [ ] Implement lightweight GUI for planet generation parameters
-  - [ ] Use **Tkinter** for simple controls (radius, subdivisions)
-  - [ ] Include button to trigger mesh generation and show logs
+- [x] Implement lightweight GUI for planet generation parameters
+  - [x] Use **Tkinter** for simple controls (radius, subdivisions)
+  - [x] Include button to trigger mesh generation and show logs
 
-- [ ] Add interactive mesh viewer
-  - [ ] Use **moderngl** for OpenGL-based GPU rendering
+- [x] Add interactive mesh viewer
+  - [x] Use **moderngl** for OpenGL-based GPU rendering
   - [ ] Display colored faces, camera control (orbit/zoom)
   - [ ] Prepare hooks for face selection and overlay layers (e.g., slope, biome)
+
+---
+
+## ToDo
 
 ### 🌐 Geometry & Mesh Analysis
 
@@ -85,6 +85,10 @@ tvg/
 │   └── tvg.log                     # Output file for logs (rotated based on config)
 │
 ├── planet_generator/               # Main planetary generation module
+│   ├── exporters/
+│   │   ├── __init__.py             # Marks as a package
+│   │   └── export_planet.py        # Takes PlanetMesh and exports an OBJ (# TODO: Add .Blend)
+│   │
 │   ├── geometry/                   # Planetary mesh generation and spatial data
 │   │   ├── __init__.py             # Marks as a package
 │   │   ├── adjacency.py            # Calculates which faces share edges
@@ -103,7 +107,8 @@ tvg/
 │   ├── components/                 # Reusable widgets (e.g., log viewer, sliders)
 │   │   ├── __init__.py
 │   │   ├── labeled_entry.py        # Reusable labeled field for numeric/text input
-│   │   └── log_console.py          # Tkinter log display linked to logger
+│   │   ├── log_console.py          # Tkinter log display linked to logger
+│   │   └── planet_viewer.py        # OpenGL viewer to preview the planet during generation. Uses glfw.
 │   │
 │   ├── screens/                    # Individual screens/views (e.g. welcome, settings)
 │   │   ├── __init__.py
@@ -123,7 +128,9 @@ tvg/
 
 ---
 
-## Logging System
+## Methodology
+
+### Logging System
 
 The project uses a custom logger defined in `logger/logger.py`.
 See `config.py` for:
@@ -131,7 +138,7 @@ See `config.py` for:
 - Whether to log to console or file (`LOG_TO_CONSOLE`, `LOG_TO_FILE`)
 - File path, size limits, and retention policy
 
-### Usage
+#### Usage
 To use the logger in any file:
 ```python
 from logger.logger import LoggerFactory
@@ -140,9 +147,17 @@ logger.info("Log message")
 ```
 This ensures consistent formatting and routing to both console and file.
 
-### Developer Note
+#### Developer Note
 ✅ **Always use `LoggerFactory` for logging** — do not use `print()` or `logging.basicConfig()`.
 When continuing this project or sharing context in new sessions, always refer to this logging system.
+
+### Mesh Data Format
+`PlanetMesh.vertices` and `PlanetMesh.faces` are stored as NumPy arrays, not lists of tuples.
+- This ensures efficient numerical operations but may require format-aware iteration when exporting or serializing.
+
+### Save File Format
+Mesh save/load operations use JobLib (compress=3) instead of pickle.
+- This reduces file size and improves speed, but requires using joblib.load() and joblib.dump() to avoid compatibility issues.
 
 ---
 

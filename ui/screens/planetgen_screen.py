@@ -72,6 +72,10 @@ class PlanetGenScreen(tk.Frame):
         generate_btn = ttk.Button(self, text="Generate Planet", command=self._generate_planet)
         generate_btn.pack(fill="x")
 
+        # Export OBJ Button
+        export_btn = ttk.Button(self, text="Export Planet as OBJ", command=self._export_planet)
+        export_btn.pack(fill="x", pady=(10, 0))
+
         # Back Button
         back_btn = ttk.Button(self, text="Back to Main Menu", command=self._go_back)
         back_btn.pack(fill="x", pady=(10, 0))
@@ -186,6 +190,29 @@ class PlanetGenScreen(tk.Frame):
 
         widget.bind("<Enter>", on_enter)
         widget.bind("<Leave>", on_leave)
+
+    def _export_planet(self):
+        """
+        Exports the most recently generated planet mesh as an OBJ file via CLI hook.
+        """
+        import os
+
+        try:
+            cmd = [
+                sys.executable,
+                os.path.join("planet_generator", "exporters", "export_planet.py"),
+                self.mesh_file_path,
+                "--output", "planet.obj", "--normals"
+            ]
+            self._append_log("Exporting planet to OBJ format with normals via command line...")
+            subprocess.run(cmd, check=True)
+            self._append_log("Planet exported to OBJ format: gamedata/exports/planet.obj")
+        except subprocess.CalledProcessError as e:
+            self._append_log(f"Export process failed: {e}")
+            self.logger.exception("Export subprocess failed")
+        except Exception as e:
+            self._append_log(f"Export failed: {e}")
+            self.logger.exception("Unexpected error during export")
 
     def _go_back(self):
         """
