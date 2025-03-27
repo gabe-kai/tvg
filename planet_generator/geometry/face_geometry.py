@@ -60,10 +60,12 @@ def compute_face_geometry(
             normals.append((nx / length, ny / length, nz / length))
             areas.append(0.5 * length)  # triangle area = 0.5 * |cross product|
 
-            # Compute slope in degrees (angle from vertical unit vector)
-            vertical = (0.0, 0.0, 1.0)
-            dot = (nx * vertical[0] + ny * vertical[1] + nz * vertical[2]) / length
-            dot = max(-1.0, min(1.0, dot))  # clamp for safety
+            # Compute slope in degrees (angle from radial vector from planet center)
+            center_len = math.sqrt(cx**2 + cy**2 + cz**2)
+            center_unit = (cx / center_len, cy / center_len, cz / center_len)
+            normal_unit = (nx / length, ny / length, nz / length)
+            dot = sum(center_unit[i] * normal_unit[i] for i in range(3))
+            dot = max(-1.0, min(1.0, dot))  # Clamp dot product to valid acos range
             angle_rad = math.acos(dot)
             slope_deg = math.degrees(angle_rad)
             slopes.append(slope_deg)
