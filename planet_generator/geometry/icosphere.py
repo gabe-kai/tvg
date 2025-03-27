@@ -2,6 +2,7 @@
 
 import math
 from typing import List, Tuple
+import numpy as np
 
 
 class IcosphereGenerator:
@@ -20,7 +21,7 @@ class IcosphereGenerator:
         self.vertices: List[Tuple[float, float, float]] = []
         self.faces: List[Tuple[int, int, int]] = []
 
-    def generate(self) -> Tuple[List[Tuple[float, float, float]], List[Tuple[int, int, int]]]:
+    def generate(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Builds the icosphere and returns the final vertices and faces.
         :return: A tuple of (vertices, faces)
@@ -29,7 +30,9 @@ class IcosphereGenerator:
         for _ in range(self.subdivisions):
             self._subdivide()
         self._normalize_vertices()
-        return self.vertices, self.faces
+        # Convert internal lists to NumPy arrays before returning for performance and consistency
+        # Internally we use mutable Python lists to support subdivision via append()
+        return np.array(self.vertices, dtype=np.float32), np.array(self.faces, dtype=np.int32)
 
     def _create_icosahedron(self):
         """

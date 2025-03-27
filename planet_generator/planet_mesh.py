@@ -1,17 +1,18 @@
 # planet_generator/planet_mesh.py
 
-from typing import List, Tuple, Dict, Optional
+from typing import List, Dict, Optional, Set
+import numpy as np
 from dataclasses import dataclass
 
 
 @dataclass
 class FaceGeometry:
-    centers: List[Tuple[float, float, float]]
-    normals: List[Tuple[float, float, float]]
-    areas: List[float]
-    latitudes: List[float]
-    longitudes: List[float]
-    slopes: List[float]
+    centers: np.ndarray      # shape (n, 3)
+    normals: np.ndarray      # shape (n, 3)
+    areas: np.ndarray        # shape (n,)
+    latitudes: np.ndarray    # shape (n,)
+    longitudes: np.ndarray   # shape (n,)
+    slopes: np.ndarray       # shape (n,)
 
 
 from logger.logger import LoggerFactory
@@ -23,10 +24,10 @@ class PlanetMesh:
     def __init__(
         self,
         radius: float,
-        vertices: List[Tuple[float, float, float]],
-        faces: List[Tuple[int, int, int]],
+        vertices: np.ndarray,  # shape (n, 3)
+        faces: np.ndarray,     # shape (m, 3)
         face_geometry: FaceGeometry,
-        face_adjacency: Dict[int, List[int]]
+        face_adjacency: Dict[int, Set[int]]
     ):
         self.radius = radius
         self.vertices = vertices
@@ -62,7 +63,8 @@ class PlanetMesh:
         This is useful for locating pentagon face groups and enabling vertex-based queries.
         """
         vertex_to_faces: Dict[int, List[int]] = {}
-        for face_index, (v1, v2, v3) in enumerate(self.faces):
+        for face_index, face in enumerate(self.faces):
+            v1, v2, v3 = face[0], face[1], face[2]
             for v in (v1, v2, v3):
                 if v not in vertex_to_faces:
                     vertex_to_faces[v] = []

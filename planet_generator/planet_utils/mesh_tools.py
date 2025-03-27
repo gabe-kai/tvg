@@ -1,11 +1,11 @@
 # planet_generator/planet_utils/mesh_tools.py
 
 import math
-from typing import List, Tuple
+import numpy as np
 import logging
 
 def validate_vertex_distances(
-    vertices: List[Tuple[float, float, float]],
+    vertices: np.ndarray,  # shape (n, 3)
     expected_radius: float,
     epsilon: float,
     logger: logging.Logger,
@@ -38,7 +38,7 @@ def validate_vertex_distances(
 
 def summarize_mesh_geometry(
     radius: float,
-    areas: List[float],
+    areas: np.ndarray,
     logger: logging.Logger
 ) -> None:
     """
@@ -58,7 +58,6 @@ def summarize_mesh_geometry(
 
     # Estimate tile sizes (most tiles are hex-based with 6 triangles)
     avg_hex_area = average_area * 6
-    pentagon_count = 12
     avg_pentagon_area = average_area * 5
 
     logger.info("--- Planet Geometry Summary ---")

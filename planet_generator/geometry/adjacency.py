@@ -1,9 +1,10 @@
 # planet_generator/geometry/adjacency.py
 
 from typing import List, Tuple, Dict, Set
+import numpy as np
 
 
-def build_face_adjacency(faces: List[Tuple[int, int, int]]) -> Dict[int, Set[int]]:
+def build_face_adjacency(faces: np.ndarray) -> Dict[int, Set[int]]:
     """
     Constructs a face adjacency map from a list of triangular faces.
 

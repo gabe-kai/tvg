@@ -30,7 +30,8 @@ def main():
     vertices, faces = generator.generate()
 
     logger.info(f"Mesh generated with {len(vertices):,} vertices and {len(faces):,} faces.")
-    logger.debug("Sample vertex: %.3f, %.3f, %.3f" % vertices[0])
+    v0 = vertices[0]
+    logger.debug("Sample vertex: %.3f, %.3f, %.3f" % (float(v0[0]), float(v0[1]), float(v0[2])))
     logger.debug("Sample face: %s" % str(faces[0]))
 
     # Step 3: Validate distances
@@ -45,11 +46,12 @@ def main():
     # Step 5: Compute face geometry
     face_geometry = compute_face_geometry(vertices, faces)
     logger.info("Computed face centers, normals, areas, slopes, and coordinates.")
-    logger.debug("Sample center (face 0): %.3f, %.3f, %.3f" % face_geometry.centers[0])
-    logger.debug("Sample normal (face 0): %.3f, %.3f, %.3f" % face_geometry.normals[0])
-    logger.debug("Sample area (face 0): %.6f" % face_geometry.areas[0])
-    logger.debug("Sample slope (face 0): %.2f°" % face_geometry.slopes[0])
-    logger.debug("Sample lat/lon (face 0): %.2f°, %.2f°" % (face_geometry.latitudes[0], face_geometry.longitudes[0]))
+    logger.debug("Sample center (face 0): %.3f, %.3f, %.3f" % (float(face_geometry.centers[0][0]), float(face_geometry.centers[0][1]), float(face_geometry.centers[0][2])))
+    n0 = face_geometry.normals[0]
+    logger.debug("Sample normal (face 0): %.3f, %.3f, %.3f" % (float(n0[0]), float(n0[1]), float(n0[2])))
+    logger.debug("Sample area (face 0): %.6f" % float(face_geometry.areas[0]))
+    logger.debug("Sample slope (face 0): %.2f°" % float(face_geometry.slopes[0]))
+    logger.debug("Sample lat/lon (face 0): %.2f°, %.2f°" % (float(face_geometry.latitudes[0]), float(face_geometry.longitudes[0])))
 
     logger.info("Planet generation complete.")
 
