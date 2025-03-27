@@ -1,29 +1,29 @@
 # planet_generator/geometry/face_geometry.py
 
 import math
-from typing import List, Tuple
+import numpy as np
 from dataclasses import dataclass
 
 
 @dataclass
 class FaceGeometry:
-    centers: List[Tuple[float, float, float]]
-    normals: List[Tuple[float, float, float]]
-    areas: List[float]
-    latitudes: List[float]  # in degrees
-    longitudes: List[float]  # in degrees
-    slopes: List[float]  # in degrees
+    centers: np.ndarray  # shape (n, 3)
+    normals: np.ndarray  # shape (n, 3)
+    areas: np.ndarray    # shape (n,)
+    latitudes: np.ndarray  # shape (n,)
+    longitudes: np.ndarray  # shape (n,)
+    slopes: np.ndarray     # shape (n,)
 
 
 def compute_face_geometry(
-    vertices: List[Tuple[float, float, float]],
-    faces: List[Tuple[int, int, int]]
+    vertices: np.ndarray,  # shape (n, 3)
+    faces: np.ndarray      # shape (m, 3)
 ) -> FaceGeometry:
     """
     Computes the center, normal, area, latitude, longitude, and slope of each triangle face.
 
-    :param vertices: List of 3D vertex coordinates
-    :param faces: List of triangle faces (triplets of vertex indices)
+    :param vertices: Nx3 NumPy array of vertex coordinates
+    :param faces: Mx3 NumPy array of triangle vertex indices
     :return: A FaceGeometry dataclass with centers, normals, areas, lat/lon, and slopes
     """
     centers = []
@@ -79,10 +79,10 @@ def compute_face_geometry(
 
     # TODO: Add support for filtering specific face indices for partial updates
     return FaceGeometry(
-        centers=centers,
-        normals=normals,
-        areas=areas,
-        latitudes=latitudes,
-        longitudes=longitudes,
-        slopes=slopes
+        centers=np.array(centers, dtype=np.float32),
+        normals=np.array(normals, dtype=np.float32),
+        areas=np.array(areas, dtype=np.float32),
+        latitudes=np.array(latitudes, dtype=np.float32),
+        longitudes=np.array(longitudes, dtype=np.float32),
+        slopes=np.array(slopes, dtype=np.float32)
     )

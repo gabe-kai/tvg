@@ -3,7 +3,7 @@
 import os
 
 # Logging configuration
-LOG_LEVEL = "DEBUG"                # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+LOG_LEVEL = "INFO"                # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
 LOG_TO_CONSOLE = True
 LOG_TO_FILE = True
 

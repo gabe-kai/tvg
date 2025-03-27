@@ -12,7 +12,13 @@ This file is intended to help ChatGPT (and me) remember where we are in the proj
 
 ## In-Progress
 
-We're working on generating the initial icosphere mesh object, with subdivisions and useful stats about the final planet.
+### 💾 Mesh Storage & Querying
+
+- [ ] Design and implement a `PlanetMesh` class to hold:
+  - Vertices, faces, face geometry, adjacency
+  - Spatial query helpers (by face index, lat/lon, center proximity)
+
+We implemented file saving and loading via pickle, but it was slow with large files. We decided to switch our lists to numpy arrays and successfully updated face_geometry.py. We still need to update planet_mesh.py to use numpy arrays where possible, and then update generate_planet.py to use the new numpy arrays as parameters instead of the old lists.
 
 ---
 
@@ -70,6 +76,9 @@ We're working on generating the initial icosphere mesh object, with subdivisions
 ```
 tvg/
 ├── .venv/                      # Virtual environment (auto-managed by PyCharm)
+│
+├── gamedata/
+│   ├── planets/                # Storage for planet objects
 │
 ├── logger/                     # Centralized logging tools
 │   ├── __init__.py             # Marks as a package

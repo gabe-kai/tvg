@@ -5,7 +5,9 @@ from planet_generator.geometry.icosphere import IcosphereGenerator
 from planet_generator.geometry.adjacency import build_face_adjacency
 from planet_generator.geometry.face_geometry import compute_face_geometry
 from planet_generator.planet_utils.mesh_tools import validate_vertex_distances, summarize_mesh_geometry
+from planet_generator.planet_mesh import PlanetMesh
 from logger.logger import LoggerFactory
+import os
 
 
 def main():
@@ -52,6 +54,21 @@ def main():
     logger.info("Planet generation complete.")
 
     summarize_mesh_geometry(radius, face_geometry.areas, logger)
+
+    # Step 6: Construct PlanetMesh and test save/load
+    mesh = PlanetMesh(
+        radius=radius,
+        vertices=vertices,
+        faces=faces,
+        face_geometry=face_geometry,
+        face_adjacency=adjacency
+    )
+
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    save_path = os.path.join(root_dir, "gamedata", "planets", "planet_test.mesh")
+    mesh.save(save_path)
+    mesh2 = PlanetMesh.load(save_path)
+    mesh2.verify_pentagon_vertices()
 
 
 if __name__ == "__main__":
