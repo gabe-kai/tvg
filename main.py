@@ -1,7 +1,9 @@
-# main.py
+# /main.py
 
 from logger.logger import LoggerFactory
-from ui.main_ui import launch_ui
+from ui.main_ui import MainUI
+from PySide6.QtWidgets import QApplication
+import sys
 
 
 def main():
@@ -11,7 +13,16 @@ def main():
     """
     logger = LoggerFactory(name="TVGApp").get_logger()
     logger.info("Starting the TVG Planet Generator UI...")
-    launch_ui()
+
+    # Create the Qt application context
+    app = QApplication(sys.argv)
+
+    # Create and show the main window
+    window = MainUI()
+    window.show()
+
+    # Run the application event loop
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
