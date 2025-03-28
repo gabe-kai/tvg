@@ -10,7 +10,7 @@ def launch_ui():
     """
     root = tk.Tk()
     root.title("TVG Planet Generator")
-    root.geometry("800x600")  # Can be adjusted as needed
+    root.geometry("1024x768")  # Can be adjusted as needed
 
     # Initialize and launch the UI state manager
     state_manager = UIStateManager(root)

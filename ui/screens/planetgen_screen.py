@@ -87,7 +87,7 @@ class PlanetGenScreen(tk.Frame):
         # Planet Viewer Frame
         import os
         self.mesh_file_path = os.path.join("gamedata", "planets", "planet_test.mesh")
-        self.viewer = PlanetViewerFrame(self, mesh_file_path=self.mesh_file_path)
+        self.viewer = PlanetViewerFrame(self, mesh_file_path=self.mesh_file_path, launch_viewer=False)
         self.viewer.pack(fill="both", expand=True, pady=(20, 0))
 
     def _reset_to_defaults(self):
@@ -149,6 +149,8 @@ class PlanetGenScreen(tk.Frame):
             if process.returncode == 0:
                 self._append_log("Planet generation completed successfully.")
                 self.viewer.destroy()
+                from ui.components.planet_viewer import PlanetMeshPreviewer
+                PlanetMeshPreviewer.debug_wireframe = PLANET_CONFIG.get("debug_wireframe", True)
                 self.viewer = PlanetViewerFrame(self, mesh_file_path=self.mesh_file_path)
                 self.viewer.pack(fill="both", expand=True, pady=(20, 0))
             else:
