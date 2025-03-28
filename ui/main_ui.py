@@ -9,8 +9,9 @@ def launch_ui():
     Initializes the Tkinter root window and starts the event loop.
     """
     root = tk.Tk()
-    root.title("TVG Planet Generator")
+    root.title("The Vassal Game")
     root.geometry("1024x768")  # Can be adjusted as needed
+    root.minsize(800, 600)  # But not smaller than this
 
     # Initialize and launch the UI state manager
     state_manager = UIStateManager(root)
