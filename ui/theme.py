@@ -11,18 +11,68 @@ DARK_THEME = """
         color: #eee;
     }
     
-    #ContextPanel {
-        background-color: #2b2b2b;
+    QWidget#HeaderPanel {
+        background-color: #222;
+        border-bottom: 2px solid #333;
     }
     
-    #ContentPanel {
+    QWidget#FooterPanel {
+        background-color: #222;
+        border-top: 2px solid #333;
+    }
+    
+    QWidget#LeftPanel {
+        background-color: #2b2b2b;
+        border-right: 2px solid #333;
+        padding: 4px;
+        margin: 0px;
+    }
+    
+    QWidget#RightPanel {
+        background-color: #2b2b2b;
+        border-left: 2px solid #333;
+        padding: 4px;
+        margin: 0px;
+    }
+    
+    QWidget#ContentPanel {
         background-color: #1e1e1e;
+        padding: 4px;
+        margin: 0px;
+    }
+    
+    QWidget#SmallContentPane {
+        background-color: transparent;
+        border: 1px solid #333;
+        padding: 2px;
+    }
+    
+    QTextEdit#SummaryTextBox {
+        background: transparent;
+        border: none;
     }
 
+    QFrame#FloatingPanel {
+        background-color: rgba(43, 43, 43, 180);
+        border: 1px solid #333;
+    }
+    
     QLabel {
         color: #ccc;
         background-color: transparent;
         border: none;
+    }
+    
+    QLabel#Title {
+        color: #eee;
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    QLabel#Header1 {
+        color: #eee;
+        font-size: 24px;
+        font-weight: bold;
     }
 
     QSpinBox, QDoubleSpinBox {
@@ -31,7 +81,11 @@ DARK_THEME = """
         border: 1px solid #555;
         padding: 4px;
     }
-
+    
+    QCheckBox {
+        background-color: transparent;
+    }
+    
     QPushButton {
         background-color: #444;
         color: black;

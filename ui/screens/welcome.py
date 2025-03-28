@@ -7,7 +7,6 @@ from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt
 import sys
 from logger.logger import LoggerFactory
-from ui.theme import DARK_THEME
 
 logger = LoggerFactory("welcome_screen").get_logger()
 
@@ -20,7 +19,6 @@ class WelcomeScreen(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setStyleSheet(DARK_THEME)  # Apply global dark theme
         self.setup_ui()
         logger.info("WelcomeScreen initialized")
 
@@ -29,10 +27,11 @@ class WelcomeScreen(QWidget):
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # --- Context Panel (Left) ---
+        # --- Left Panel ---
         self.left_panel = QWidget()
-        self.left_panel.setObjectName("ContextPanel")  # For theme-based styling
+        self.left_panel.setObjectName("LeftPanel")  # For theme-based styling
         self.left_panel.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.left_panel.setAttribute(Qt.WA_StyledBackground, True)
 
         button_column = QVBoxLayout(self.left_panel)
         button_column.addStretch(3)  # Push buttons to the bottom
@@ -72,9 +71,8 @@ class WelcomeScreen(QWidget):
         content_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
         title = QLabel("The Vassal Game")
+        title.setObjectName("Title")
         title.setAlignment(Qt.AlignCenter)
-        title.setFont(QFont("Arial", 32, QFont.Bold))
-        title.setStyleSheet("color: white;")
         content_layout.addWidget(title)
 
         # --- Assemble main layout ---

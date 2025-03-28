@@ -1,4 +1,4 @@
-# config.py
+# /config.py
 
 import os
 
@@ -13,3 +13,6 @@ LOG_DIR = os.path.join(ROOT_DIR, "logs")
 LOG_FILE_NAME = "tvg.log"
 LOG_FILE_MAX_BYTES = 5 * 1024 * 1024  # 5 MB
 LOG_FILE_BACKUP_COUNT = 3             # Keep 3 backups
+
+# UI Color Theme
+ACTIVE_THEME = "DARK_THEME"

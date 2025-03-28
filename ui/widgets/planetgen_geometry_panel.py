@@ -1,6 +1,6 @@
 # /ui/widgets/planetgen_geometry_panel.py
 
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QFrame
+from PySide6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QSizePolicy
 from PySide6.QtCore import Qt
 
 
@@ -13,19 +13,20 @@ class PlanetGenGeometryPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedWidth(200)
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        self.setObjectName("SmallContentPane")
         self.setAttribute(Qt.WA_StyledBackground, True)
-        self.setStyleSheet("background-color: transparent; border: none;")
 
         # Layout and content
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(4, 4, 4, 4)
         self.layout.setSpacing(8)
 
-        self.label = QLabel("[ Geometry Summary Panel ]")
-        self.label.setStyleSheet("background-color: #2a2a2a; border: 1px solid #555; padding: 6px;")
-        self.label.setWordWrap(True)
-        self.label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-        self.layout.addWidget(self.label)
+        self.textbox = QTextEdit()
+        self.textbox.setObjectName("SummaryTextBox")
+        self.textbox.setReadOnly(True)
+        self.textbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.layout.addWidget(self.textbox)
 
     def update_summary(self, data: dict):
         """
@@ -40,7 +41,15 @@ class PlanetGenGeometryPanel(QWidget):
             else:
                 lines.append(f"{key.replace('_', ' ').title()}: {value:,}")
 
-        self.label.setText("\n".join(lines))
-        self.label.setWordWrap(True)
-        self.label.adjustSize()
-        self.adjustSize()
+        content = "\n".join(lines)
+        self.textbox.setText(content)
+
+        # Resize textbox height to match number of lines (up to 8)
+        font_metrics = self.textbox.fontMetrics()
+        line_height = font_metrics.lineSpacing()
+        line_count = content.count("\n") + 1
+        max_lines = 8
+
+        height = min(line_count, max_lines) * line_height + 12
+        self.textbox.setMinimumHeight(height)
+        self.textbox.setMaximumHeight(height if line_count <= max_lines else line_height * max_lines + 12)

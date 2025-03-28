@@ -27,7 +27,6 @@ class PlanetGenControlPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ContextPanel")  # Allow styling via theme
-        self.setAttribute(Qt.WA_StyledBackground, True)  # Allow stylesheet background to render
 
         # Diagnostic logging
         logger.info(f"PlanetGenControlPanel class: {self.metaObject().className()} | objectName: {self.objectName()}")
@@ -53,7 +52,6 @@ class PlanetGenControlPanel(QWidget):
 
         # Subdivision suggestion label
         self.suggested_label = QLabel()
-        self.suggested_label.setStyleSheet("color: #888; font-size: 11px;")
 
         # Subdivision input
         self.subdiv_input = QSpinBox()

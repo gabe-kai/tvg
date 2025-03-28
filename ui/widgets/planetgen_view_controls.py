@@ -15,10 +15,9 @@ class PlanetGenViewControls(QWidget):
         super().__init__(parent)
         self.preview_widget = preview_widget
         self.logger = LoggerFactory("planet_view_controls").get_logger()
-
         self.setFixedWidth(200)
-        self.setStyleSheet("background-color: #2a2a2a; border: 1px solid #555; padding: 6px;")
-
+        self.setObjectName("SmallContentPane")
+        self.setAttribute(Qt.WA_StyledBackground, True)
         self.setup_ui()
 
     def setup_ui(self):
@@ -28,7 +27,6 @@ class PlanetGenViewControls(QWidget):
         layout.setSpacing(8)
 
         self.wireframe_toggle = QCheckBox("Wireframe Mode")
-        self.wireframe_toggle.setStyleSheet("color: #ccc;")
         self.wireframe_toggle.stateChanged.connect(self.toggle_wireframe)
         layout.addWidget(self.wireframe_toggle)
 
