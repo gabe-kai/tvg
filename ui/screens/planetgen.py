@@ -1,13 +1,15 @@
 # /ui/screens/planetgen.py
 
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy, QFrame
 )
 from PySide6.QtCore import Qt, QSize, QEvent
 from logger.logger import LoggerFactory
 from planet_generator.planet_utils.mesh_tools import estimate_optimal_subdivision, summarize_mesh_geometry
 from ui.widgets.planetgen_control_panel import PlanetGenControlPanel
 from ui.widgets.planetgen_geometry_panel import PlanetGenGeometryPanel
+from ui.widgets.planet_preview_widget import PlanetPreviewWidget
+from ui.widgets.planetgen_view_controls import PlanetGenViewControls
 from ui.theme import DARK_THEME
 
 logger = LoggerFactory("planetgen_screen").get_logger()
@@ -51,14 +53,26 @@ class PlanetGenScreen(QWidget):
         self.left_panel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Use absolute positioning inside left_panel
-        self.planet_preview_label = QLabel("[ Planet Preview Area ]", self.left_panel)
-        self.planet_preview_label.setAlignment(Qt.AlignCenter)
-        self.planet_preview_label.setGeometry(0, 0, 1, 1)  # Will stretch by size policy
-        self.planet_preview_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        layout = QVBoxLayout(self.left_panel)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.planet_preview = PlanetPreviewWidget("gamedata/planets/planet_test.mesh")
+        layout.addWidget(self.planet_preview)
+        self.planet_preview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self.summary_panel = PlanetGenGeometryPanel(self.left_panel)
-        self.summary_panel.move(10, 10)  # Top-right can be adjusted later
+        self.floating_panel = QFrame(self.left_panel)
+        self.floating_panel.setStyleSheet("background-color: #2a2a2a; border: 1px solid #555;")
 
+        float_layout = QVBoxLayout(self.floating_panel)
+        float_layout.setContentsMargins(6, 6, 6, 6)
+        float_layout.setSpacing(8)
+
+        self.summary_panel = PlanetGenGeometryPanel(self.floating_panel)
+        self.view_controls = PlanetGenViewControls(self.floating_panel, self.planet_preview)
+
+        float_layout.addWidget(self.summary_panel)
+        float_layout.addWidget(self.view_controls)  # Top-right can be adjusted later
+
+        self.floating_panel.adjustSize()
         center_layout.addWidget(self.left_panel, stretch=3)
 
         # Right Panel (Inputs and Controls)
@@ -79,6 +93,7 @@ class PlanetGenScreen(QWidget):
 
         # Connect control panel input signal
         self.right_panel.inputs_changed.connect(self.update_geometry_summary)
+        self.right_panel.mesh_generated.connect(self.planet_preview.reload_mesh)
         self.update_geometry_summary()  # Initial fill
 
     def resizeEvent(self, event):
@@ -114,9 +129,9 @@ class PlanetGenScreen(QWidget):
         self.summary_panel.update_summary(summary_data)
 
         """Repositions the floating summary panel to the top-right corner of the left panel."""
-        if hasattr(self, 'left_panel') and hasattr(self, 'summary_panel'):
+        if hasattr(self, 'left_panel') and hasattr(self, 'floating_panel'):
             margin = 10
-            panel_width = self.summary_panel.width()
+            panel_width = self.floating_panel.width()
             x = self.left_panel.width() - panel_width - margin
             y = margin
-            self.summary_panel.move(x, y)
+            self.floating_panel.move(x, y)

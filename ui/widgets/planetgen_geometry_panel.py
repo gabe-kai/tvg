@@ -1,6 +1,6 @@
 # /ui/widgets/planetgen_geometry_panel.py
 
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QFrame
 from PySide6.QtCore import Qt
 
 
@@ -12,23 +12,18 @@ class PlanetGenGeometryPanel(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedSize(280, 140)
-        self.setStyleSheet(
-            """
-            background-color: #333;
-            color: #ccc;
-            border: 1px solid #555;
-            padding: 6px;
-            """
-        )
+        self.setFixedWidth(200)
         self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setStyleSheet("background-color: transparent; border: none;")
 
         # Layout and content
         self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(6, 6, 6, 6)
-        self.layout.setSpacing(4)
+        self.layout.setContentsMargins(4, 4, 4, 4)
+        self.layout.setSpacing(8)
 
         self.label = QLabel("[ Geometry Summary Panel ]")
+        self.label.setStyleSheet("background-color: #2a2a2a; border: 1px solid #555; padding: 6px;")
+        self.label.setWordWrap(True)
         self.label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.layout.addWidget(self.label)
 
@@ -46,3 +41,6 @@ class PlanetGenGeometryPanel(QWidget):
                 lines.append(f"{key.replace('_', ' ').title()}: {value:,}")
 
         self.label.setText("\n".join(lines))
+        self.label.setWordWrap(True)
+        self.label.adjustSize()
+        self.adjustSize()

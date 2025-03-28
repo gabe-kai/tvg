@@ -22,6 +22,7 @@ DARK_THEME = """
     QLabel {
         color: #ccc;
         background-color: transparent;
+        border: none;
     }
 
     QSpinBox, QDoubleSpinBox {

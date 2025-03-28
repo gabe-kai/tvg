@@ -22,6 +22,7 @@ class PlanetGenControlPanel(QWidget):
     to generate, export, reset, or go back.
     """
     inputs_changed = Signal()  # Emitted when radius or subdivision values change
+    mesh_generated = Signal()  # Emitted when mesh is successfully generated
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -150,6 +151,7 @@ class PlanetGenControlPanel(QWidget):
                 check=True
             )
             logger.info("Planet generation subprocess completed successfully.")
+            self.mesh_generated.emit()
         except subprocess.CalledProcessError as e:
             logger.error(f"Planet generation script failed: {e}")
 
