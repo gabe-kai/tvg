@@ -75,63 +75,73 @@ tvg/
 ├── .venv/                          # Virtual environment (auto-managed by PyCharm)
 │
 ├── gamedata/
-│   ├── exports/                    # Storage for planets exported as OBJ files
-│   └── planets/                    # Storage for planet objects
+│   ├── exports/                    # Storage for exported files (e.g., OBJ, GLTF) for use outside the app
+│   └── planets/                    # Folder-based save directories for each generated planet (one folder per planet)
 │
 ├── logger/                         # Centralized logging tools
-│   ├── __init__.py                 # Marks as a package
+│   ├── __init__.py
 │   └── logger.py                   # LoggerFactory with color output and rotating file handler
 │
-├── logs/                           # Auto-created directory for logs
-│   └── tvg.log                     # Output file for logs (rotated based on config)
+├── logs/                           # Auto-created log output directory
+│   └── tvg.log                     # Output file for logs (rotated based on config settings in config.py)
 │
-├── planet_generator/               # Main planetary generation module
+├── planet_generator/               # All backend logic for planet generation, geometry, and persistence
 │   ├── exporters/
-│   │   ├── __init__.py             # Marks as a package
-│   │   └── export_planet.py        # Takes PlanetMesh and exports an OBJ (# TODO: Add .Blend)
-│   │
-│   ├── geometry/                   # Planetary mesh generation and spatial data
-│   │   ├── __init__.py             # Marks as a package
-│   │   ├── adjacency.py            # Calculates which faces share edges
-│   │   ├── face_geometry.py        # Computes face centers, normals, area, slope, and lat/lon
-│   │   └── icosphere.py            # Builds and subdivides an icosahedral sphere mesh
-│   │
-│   ├── planet_utils/               # Shared utility methods for geometry/topology
-│   │   ├── __init__.py             # Marks as a package
-│   │   └── mesh_tools.py           # Mesh inspection tools (validate_vertex_distances, summarize_mesh_geometry, etc)
-│   │
-│   ├── __init__.py                 # Marks as a package
-│   ├── generate_planet.py          # Orchestrates full generation process
-│   ├── planet_config.py            # User-editable settings for world generation
-│   └── planet_mesh.py              # Needs description
-│
-├── ui/                             # UI package for all interface logic
-│   ├── components/                 # Reusable components more significant than widgets
 │   │   ├── __init__.py
+│   │   └── export_planet.py        # Exports a PlanetMesh to OBJ format for 3D visualization (# TODO: Add .blend or GLTF export)
 │   │
-│   ├── screens/                    # Individual screens/views (e.g. welcome, settings)
+│   ├── geometry/                   # Geometry creation and spatial data tools
 │   │   ├── __init__.py
-│   │   ├── planetgen.py            # Planet generation screen with options and previewer
-│   │   └── welcome.py              # The game welcome screen (new game, load game, options, about, & quit)
+│   │   ├── adjacency.py            # Calculates face adjacency (neighbors by shared edges)
+│   │   ├── face_geometry.py        # Computes face centers, normals, area, slope, latitude & longitude
+│   │   └── icosphere.py            # Builds and recursively subdivides an icosahedral sphere mesh
 │   │
-│   ├── tests/                      # Standalone files for testing functionality before integration
-│   │   └── test_opengl_widget.py   # OpenGL viewer test.
-│   │
-│   ├── widgets/                    # Reusable widgets (e.g., log viewer, sliders)
+│   ├── io/                         # Planet save/load system using the Planet wrapper class
 │   │   ├── __init__.py
-│   │   ├── planet_preview_widget.py    # OpenGL viewer to watch the planet as it is generated.
-│   │   ├── planet_control_panel.py     # Planet creation options widget
-│   │   ├── planet_geometry_panel.py    # Planet summary widget (radius, surface area, circumference, etc)
-│   │   └── planet_view_controls.py     # OpenGL viewer options (wireframe, rotation, etc)
+│   │   └── planet_io.py            # Defines the Planet wrapper and handles folder-based save/load with joblib and metadata
+│   │
+│   ├── planet_utils/               # Helper utilities for geometry, inspection, and debugging
+│   │   ├── __init__.py
+│   │   └── mesh_tools.py           # Utilities for validating mesh geometry and summarizing mesh statistics
 │   │
 │   ├── __init__.py
-│   ├── main_ui.py                  # Needs description
-│   └── theme.py                    # Stylesheet for the UI screens.
+│   ├── generate_planet.py          # CLI entry point for full procedural planet generation
+│   ├── planet_config.py            # Default planet configuration settings (e.g. radius, subdivisions)
+│   └── planet_mesh.py              # PlanetMesh class that stores mesh data, face geometry, and adjacency map
 │
-├── __init__.py                     # Marks the root folder as a Python package
-├── config.py                       # Global logging configuration (used across modules)
-├── main.py                         # Starts the UI (calls ui.main_ui)
-└── Status.md                       # Project planning, notes, and developer checklist
+├── ui/                             # PySide6-based GUI implementation
+│   ├── components/                 # (Reserved for) complex, reusable UI components that aren't atomic widgets
+│   │   └── __init__.py
+│   │
+│   ├── screens/                    # Top-level screens / views (Welcome, PlanetGen, etc)
+│   │   ├── __init__.py
+│   │   ├── planetgen.py            # Layout and logic for the planet generation screen and preview display
+│   │   └── welcome.py              # The game's welcome screen (new game, load game, settings, about, quit)
+│   │
+│   ├── state/                      # Centralized state manager for controlling screen transitions
+│   │   ├── __init__.py
+│   │   └── ui_state_manager.py     # Manages transitions between UI states (welcome → planetgen → editor, etc)
+│   │
+│   ├── tests/                      # Self-contained OpenGL and UI test files
+│   │   └── test_opengl_widget.py   # Test harness for debugging OpenGL rendering in isolation
+│   │
+│   ├── widgets/                    # Reusable UI widgets, composable in screens or other widgets
+│   │   ├── __init__.py
+│   │   ├── planet_preview_widget.py    # OpenGL viewer that renders the planet from a saved mesh file
+│   │   ├── planet_control_panel.py     # Sidebar for planet parameters (name, seed, radius, subdivisions)
+│   │   ├── planet_geometry_panel.py    # Summary panel for mesh geometry stats (area, tile sizes, etc)
+│   │   └── planet_view_controls.py     # Viewer overlay for toggling wireframe mode and other view settings
+│   │
+│   ├── __init__.py
+│   ├── main_ui.py                  # Entry point for launching the main GUI application and its screens
+│   └── theme.py                    # Central stylesheet and theming setup for PySide6 widgets and layouts
+│
+├── __init__.py                     # Marks project root as a package
+├── config.py                       # Global logging and configuration settings
+├── main.py                         # Application entry point — initializes and launches the main UI
+├── requirements.txt                # Python dependencies (PySide6, numpy, OpenGL, joblib, etc.)
+└── Status.md                       # Project planning, TODOs, dev notes, and daily status summaries
+
 ```
 
 ---

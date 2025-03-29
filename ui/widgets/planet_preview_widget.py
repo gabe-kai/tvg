@@ -17,6 +17,9 @@ class PlanetPreviewWidget(QOpenGLWidget):
     """
 
     def __init__(self, mesh_path, parent=None):
+        """
+        Initializes the planet preview widget with a mesh file path.
+        """
         super().__init__(parent)
         self.mesh_ready = False
         self.mesh_path = mesh_path
@@ -82,6 +85,12 @@ class PlanetPreviewWidget(QOpenGLWidget):
                 v = self.vertices[int(idx)]
                 glVertex3f(float(v[0]), float(v[1]), float(v[2]))
         glEnd()
+
+    def set_mesh_path(self, new_path: str):
+        """
+        Updates the internal mesh path before reloading.
+        """
+        self.mesh_path = new_path
 
     def reload_mesh(self):
         self.load_mesh()
