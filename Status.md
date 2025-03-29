@@ -76,7 +76,7 @@ tvg/
 │
 ├── gamedata/
 │   ├── exports/                    # Storage for planets exported as OBJ files
-│   ├── planets/                    # Storage for planet objects
+│   └── planets/                    # Storage for planet objects
 │
 ├── logger/                         # Centralized logging tools
 │   ├── __init__.py                 # Marks as a package
@@ -98,11 +98,12 @@ tvg/
 │   │
 │   ├── planet_utils/               # Shared utility methods for geometry/topology
 │   │   ├── __init__.py             # Marks as a package
-│   │   └── mesh_tools.py           # Mesh inspection tools (e.g. vertex distance checks)
+│   │   └── mesh_tools.py           # Mesh inspection tools (validate_vertex_distances, summarize_mesh_geometry, etc)
 │   │
 │   ├── __init__.py                 # Marks as a package
 │   ├── generate_planet.py          # Orchestrates full generation process
-│   └── planet_config.py            # User-editable settings for world generation
+│   ├── planet_config.py            # User-editable settings for world generation
+│   └── planet_mesh.py              # Needs description
 │
 ├── ui/                             # UI package for all interface logic
 │   ├── components/                 # Reusable components more significant than widgets
@@ -110,11 +111,22 @@ tvg/
 │   │
 │   ├── screens/                    # Individual screens/views (e.g. welcome, settings)
 │   │   ├── __init__.py
+│   │   ├── planetgen.py            # Planet generation screen with options and previewer
+│   │   └── welcome.py              # The game welcome screen (new game, load game, options, about, & quit)
+│   │
+│   ├── tests/                      # Standalone files for testing functionality before integration
+│   │   └── test_opengl_widget.py   # OpenGL viewer test.
 │   │
 │   ├── widgets/                    # Reusable widgets (e.g., log viewer, sliders)
 │   │   ├── __init__.py
+│   │   ├── planet_preview_widget.py    # OpenGL viewer to watch the planet as it is generated.
+│   │   ├── planet_control_panel.py     # Planet creation options widget
+│   │   ├── planet_geometry_panel.py    # Planet summary widget (radius, surface area, circumference, etc)
+│   │   └── planet_view_controls.py     # OpenGL viewer options (wireframe, rotation, etc)
 │   │
 │   ├── __init__.py
+│   ├── main_ui.py                  # Needs description
+│   └── theme.py                    # Stylesheet for the UI screens.
 │
 ├── __init__.py                     # Marks the root folder as a Python package
 ├── config.py                       # Global logging configuration (used across modules)

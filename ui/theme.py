@@ -53,7 +53,7 @@ DARK_THEME = """
     }
 
     QFrame#FloatingPanel {
-        background-color: rgba(43, 43, 43, 180);
+        background-color: rgba(43, 43, 43, 224);
         border: 1px solid #333;
     }
     
