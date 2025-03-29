@@ -2,7 +2,7 @@
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QPushButton, QLabel,
-    QFormLayout, QDoubleSpinBox, QSpinBox, QCheckBox, QFrame
+    QFormLayout, QDoubleSpinBox, QSpinBox, QCheckBox, QFrame, QLineEdit
 )
 from PySide6.QtCore import Qt, Signal
 from logger.logger import LoggerFactory
@@ -21,7 +21,7 @@ class PlanetGenControlPanel(QWidget):
     Contains inputs for radius and subdivision level, and buttons
     to generate, export, reset, or go back.
     """
-    inputs_changed = Signal()  # Emitted when radius or subdivision values change
+    inputs_changed = Signal()  # Emitted when any input value changes
     mesh_generated = Signal()  # Emitted when mesh is successfully generated
 
     def __init__(self, parent=None):
@@ -41,6 +41,20 @@ class PlanetGenControlPanel(QWidget):
 
         # --- Form layout for inputs ---
         form = QFormLayout()
+
+        # Planet name input
+        self.name_input = QLineEdit("UnnamedPlanet")
+        self.name_input.setToolTip("Name of the planet to be generated.")
+        self.name_input.textChanged.connect(lambda: self.inputs_changed.emit())
+        form.addRow("Planet Name:", self.name_input)
+
+        # Seed input
+        self.seed_input = QSpinBox()
+        self.seed_input.setRange(0, 999999)
+        self.seed_input.setValue(42)
+        self.seed_input.setToolTip("Seed for planet generation randomness.")
+        self.seed_input.valueChanged.connect(lambda: self.inputs_changed.emit())
+        form.addRow("Seed:", self.seed_input)
 
         # Radius input
         self.radius_input = QDoubleSpinBox()
@@ -125,6 +139,8 @@ class PlanetGenControlPanel(QWidget):
         Slot: Reset input fields to default values from configuration.
         """
         logger.info("Resetting input fields to default values.")
+        self.name_input.setText("UnnamedPlanet")
+        self.seed_input.setValue(42)
         self.radius_input.setValue(PLANET_CONFIG["planet_radius"])
         self.subdiv_input.setValue(PLANET_CONFIG["subdivisions"])
 
@@ -134,6 +150,8 @@ class PlanetGenControlPanel(QWidget):
         """
         radius = self.radius_input.value()
         subdivisions = self.subdiv_input.value()
+        name = self.name_input.text()
+        seed = self.seed_input.value()
 
         script_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -141,11 +159,17 @@ class PlanetGenControlPanel(QWidget):
         )
         script_path = os.path.normpath(script_path)
 
-        logger.info(f"Running planet generator script with radius={radius}, subdivisions={subdivisions}")
+        logger.info(f"Running planet generator script with name={name}, seed={seed}, radius={radius}, subdivisions={subdivisions}")
 
         try:
             subprocess.run(
-                [sys.executable, script_path, "--radius", str(radius), "--subdivisions", str(subdivisions)],
+                [
+                    sys.executable, script_path,
+                    "--radius", str(radius),
+                    "--subdivisions", str(subdivisions),
+                    "--name", name,
+                    "--seed", str(seed)
+                ],
                 check=True
             )
             logger.info("Planet generation subprocess completed successfully.")

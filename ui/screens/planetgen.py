@@ -1,9 +1,12 @@
 # /ui/screens/planetgen.py
 
+import os
+import json
+import time
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy, QFrame
 )
-from PySide6.QtCore import Qt, QSize, QEvent
+from PySide6.QtCore import Qt
 from logger.logger import LoggerFactory
 from planet_generator.planet_utils.mesh_tools import estimate_optimal_subdivision, summarize_mesh_geometry
 from ui.widgets.planetgen_control_panel import PlanetGenControlPanel
@@ -12,6 +15,27 @@ from ui.widgets.planet_preview_widget import PlanetPreviewWidget
 from ui.widgets.planetgen_view_controls import PlanetGenViewControls
 
 logger = LoggerFactory("planetgen_screen").get_logger()
+
+
+def find_most_recent_planet_folder():
+    base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "gamedata", "planets")
+    if not os.path.exists(base_dir):
+        return None
+    subdirs = [
+        os.path.join(base_dir, name) for name in os.listdir(base_dir)
+        if os.path.isdir(os.path.join(base_dir, name))
+    ]
+    subdirs = sorted(subdirs, key=lambda d: os.path.getmtime(os.path.join(d, "metadata.json")) if os.path.exists(os.path.join(d, "metadata.json")) else 0, reverse=True)
+    return subdirs[0] if subdirs else None
+
+
+def load_most_recent_metadata(folder):
+    try:
+        with open(os.path.join(folder, "metadata.json"), "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        logger.warning(f"Could not load metadata from {folder}: {e}")
+        return None
 
 
 class PlanetGenScreen(QWidget):
@@ -39,10 +63,10 @@ class PlanetGenScreen(QWidget):
         header_layout = QVBoxLayout(self.header_container)
         header_layout.setContentsMargins(0, 0, 0, 0)
 
-        title = QLabel("Planet Generator")
-        title.setObjectName("Header1")
-        title.setAlignment(Qt.AlignCenter)
-        header_layout.addWidget(title)
+        self.title_label = QLabel("Planet Preview:")
+        self.title_label.setObjectName("Header1")
+        self.title_label.setAlignment(Qt.AlignCenter)
+        header_layout.addWidget(self.title_label)
         main_layout.addWidget(self.header_container)
 
         # --- Central Horizontal Layout ---
@@ -58,7 +82,9 @@ class PlanetGenScreen(QWidget):
         layout = QVBoxLayout(self.left_panel_container)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        self.planet_preview = PlanetPreviewWidget("gamedata/planets/planet_test.mesh")
+        recent_folder = find_most_recent_planet_folder()
+        mesh_path = os.path.join(recent_folder, "mesh.joblib") if recent_folder else ""
+        self.planet_preview = PlanetPreviewWidget(mesh_path)
         layout.addWidget(self.planet_preview)
         self.planet_preview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -106,9 +132,27 @@ class PlanetGenScreen(QWidget):
         footer_layout.addWidget(self.footer)
         main_layout.addWidget(self.footer_container)
 
+        # Prefill control panel if recent planet metadata exists
+        if recent_folder:
+            metadata = load_most_recent_metadata(recent_folder)
+            if metadata:
+                planet_name = metadata.get("name")
+                planet_seed = metadata.get("seed")
+                if planet_name:
+                    self.title_label.setText(f"Planet Preview: {planet_name}")
+                    self.control_panel.name_input.setText(planet_name)
+                if planet_seed is not None:
+                    self.control_panel.seed_input.setValue(int(planet_seed))
+                planet_radius = metadata.get("radius")
+                subdivisions = metadata.get("subdivisions")
+                if planet_radius is not None:
+                    self.control_panel.radius_input.setValue(float(planet_radius))
+                if subdivisions is not None:
+                    self.control_panel.subdiv_input.setValue(int(subdivisions))
+
         # Connect signals
         self.control_panel.inputs_changed.connect(self.update_geometry_summary)
-        self.control_panel.mesh_generated.connect(self.planet_preview.reload_mesh)
+        self.control_panel.mesh_generated.connect(self.handle_mesh_generated)
         self.update_geometry_summary()  # Initial fill
 
     def resizeEvent(self, event):
@@ -147,3 +191,23 @@ class PlanetGenScreen(QWidget):
             x = self.left_panel_container.width() - panel_width - margin
             y = margin
             self.floating_panel.move(x, y)
+
+    def handle_mesh_generated(self):
+        """Update header title when mesh is generated."""
+        name = self.control_panel.name_input.text()
+        self.title_label.setText(f"Planet Preview: {name}")
+                # Wait for the new mesh file to appear (max 2 sec)
+        planet_name = self.control_panel.name_input.text()
+        base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "gamedata", "planets")
+        mesh_path = os.path.join(base_dir, planet_name, "mesh.joblib")
+
+        wait_time = 0
+        while not os.path.exists(mesh_path) and wait_time < 2.0:
+            time.sleep(0.1)
+            wait_time += 0.1
+
+        if os.path.exists(mesh_path):
+            self.planet_preview.set_mesh_path(mesh_path)
+            self.planet_preview.reload_mesh()
+        else:
+            logger.warning(f"Mesh file not found after generation: {mesh_path}")
