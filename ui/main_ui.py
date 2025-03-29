@@ -1,23 +1,31 @@
 # /ui/main_ui.py
 
-import tkinter as tk
-from ui.state_manager import UIStateManager
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtCore import QSize
 
-def launch_ui():
+# Project Logging
+from logger.logger import LoggerFactory
+logger = LoggerFactory("main_ui").get_logger()
+
+# UI State Management
+from ui.state.ui_state_manager import UIStateManager
+
+
+class MainUI(QMainWindow):
     """
-    Launches the main UI application window.
-    Initializes the Tkinter root window and starts the event loop.
+    Main application window for The Vassal Game UI.
+    Sets the window title, default size, and minimum size constraints.
+    Loads the UIStateManager as the central widget to manage screens.
     """
-    root = tk.Tk()
-    root.title("The Vassal Game")
-    root.geometry("1024x768")  # Can be adjusted as needed
-    root.minsize(800, 600)  # But not smaller than this
 
-    # Initialize and launch the UI state manager
-    state_manager = UIStateManager(root)
+    def __init__(self):
+        super().__init__()
 
-    # Start the main loop
-    root.mainloop()
+        self.setWindowTitle("The Vassal Game")
+        self.resize(QSize(1024, 768))
+        self.setMinimumSize(QSize(800, 600))
 
-if __name__ == "__main__":
-    launch_ui()
+        self.state_manager = UIStateManager(self)
+        self.setCentralWidget(self.state_manager)
+
+        logger.info("MainUI initialized with UIStateManager")

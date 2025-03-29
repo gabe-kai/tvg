@@ -9,13 +9,13 @@ This file is intended to help ChatGPT (and me) remember where we are in the proj
 ## Daily Commit Summaries
  
 - 2025.03.26: Rebuilt the icosphere generator, and pre-elevation modification steps with object-oriented code, and better logging.
-- 2025.03.27: Implemented save-files for the Planet object. Implemented a basic UI for planet generation and viewing.
+- 2025.03.27: Implemented save-files for the Planet object. Implemented a basic UI for planet generation and viewing. Dismissed it all and started a new branch to build the UI with PySide6.
 
 ---
 
 ## In-Progress
 
-Build basic UI and visualizer.
+Build basic UI and visualizer. You're in the "pyside6-ui-rebuild" git branch.
 
 ### 💾 Mesh Storage & Querying
 
@@ -26,20 +26,20 @@ Build basic UI and visualizer.
 - [ ] Add file-based persistence (Flatbuffers, MessagePack, or custom binary)
 - [ ] Enable loading mesh data for off-screen processing (pathfinding, climate)
 
-### 🖥️ UI + Visualization
-
-- [x] Implement lightweight GUI for planet generation parameters
-  - [x] Use **Tkinter** for simple controls (radius, subdivisions)
-  - [x] Include button to trigger mesh generation and show logs
-
-- [x] Add interactive mesh viewer
-  - [x] Use **moderngl** for OpenGL-based GPU rendering
-  - [ ] Display colored faces, camera control (orbit/zoom)
-  - [ ] Prepare hooks for face selection and overlay layers (e.g., slope, biome)
-
 ---
 
 ## ToDo
+
+### 🖥️ UI + Visualization
+
+- [ ] Implement a GUI for planet generation parameters
+  - [ ] Use **PySide6** for simple controls (radius, subdivisions)
+  - [ ] Include button to trigger mesh generation and show logs
+
+- [ ] Add interactive mesh viewer
+  - [ ] Use **QOpenGLWidget** for OpenGL-based GPU rendering
+  - [ ] Display colored faces, camera control (orbit/zoom)
+  - [ ] Prepare hooks for face selection and overlay layers (e.g., slope, biome)
 
 ### 🌐 Geometry & Mesh Analysis
 
@@ -75,7 +75,8 @@ tvg/
 ├── .venv/                          # Virtual environment (auto-managed by PyCharm)
 │
 ├── gamedata/
-│   ├── planets/                    # Storage for planet objects
+│   ├── exports/                    # Storage for planets exported as OBJ files
+│   └── planets/                    # Storage for planet objects
 │
 ├── logger/                         # Centralized logging tools
 │   ├── __init__.py                 # Marks as a package
@@ -97,28 +98,35 @@ tvg/
 │   │
 │   ├── planet_utils/               # Shared utility methods for geometry/topology
 │   │   ├── __init__.py             # Marks as a package
-│   │   └── mesh_tools.py           # Mesh inspection tools (e.g. vertex distance checks)
+│   │   └── mesh_tools.py           # Mesh inspection tools (validate_vertex_distances, summarize_mesh_geometry, etc)
 │   │
 │   ├── __init__.py                 # Marks as a package
 │   ├── generate_planet.py          # Orchestrates full generation process
-│   └── planet_config.py            # User-editable settings for world generation
+│   ├── planet_config.py            # User-editable settings for world generation
+│   └── planet_mesh.py              # Needs description
 │
 ├── ui/                             # UI package for all interface logic
-│   ├── components/                 # Reusable widgets (e.g., log viewer, sliders)
+│   ├── components/                 # Reusable components more significant than widgets
 │   │   ├── __init__.py
-│   │   ├── labeled_entry.py        # Reusable labeled field for numeric/text input
-│   │   ├── log_console.py          # Tkinter log display linked to logger
-│   │   └── planet_viewer.py        # OpenGL viewer to preview the planet during generation. Uses glfw.
 │   │
 │   ├── screens/                    # Individual screens/views (e.g. welcome, settings)
 │   │   ├── __init__.py
-│   │   ├── planetgen_screen.py     # Planet generation controls and mesh preview
-│   │   ├── settings_screen.py      # Optional future settings UI
-│   │   └── welcome_screen.py       # New Game, Load, Settings menu
+│   │   ├── planetgen.py            # Planet generation screen with options and previewer
+│   │   └── welcome.py              # The game welcome screen (new game, load game, options, about, & quit)
+│   │
+│   ├── tests/                      # Standalone files for testing functionality before integration
+│   │   └── test_opengl_widget.py   # OpenGL viewer test.
+│   │
+│   ├── widgets/                    # Reusable widgets (e.g., log viewer, sliders)
+│   │   ├── __init__.py
+│   │   ├── planet_preview_widget.py    # OpenGL viewer to watch the planet as it is generated.
+│   │   ├── planet_control_panel.py     # Planet creation options widget
+│   │   ├── planet_geometry_panel.py    # Planet summary widget (radius, surface area, circumference, etc)
+│   │   └── planet_view_controls.py     # OpenGL viewer options (wireframe, rotation, etc)
 │   │
 │   ├── __init__.py
-│   ├── main_ui.py                  # Entry point for all UI logic
-│   └── state_manager.py            # Handles screen switching, shared app state
+│   ├── main_ui.py                  # Needs description
+│   └── theme.py                    # Stylesheet for the UI screens.
 │
 ├── __init__.py                     # Marks the root folder as a Python package
 ├── config.py                       # Global logging configuration (used across modules)
@@ -153,6 +161,8 @@ When continuing this project or sharing context in new sessions, always refer to
 
 ### Mesh Data Format
 `PlanetMesh.vertices` and `PlanetMesh.faces` are stored as NumPy arrays, not lists of tuples.
+- This ensures efficient numerical operations but may require format-aware iteration when exporting or serializing.
+- ⚠️ **Reminder**: NumPy is row-major, but OpenGL (and many viewers) may expect flat, interleaved vertex buffers. Always double-check the order of `vertices` and `faces` when passing data to shaders or rendering libraries.
 - This ensures efficient numerical operations but may require format-aware iteration when exporting or serializing.
 
 ### Save File Format

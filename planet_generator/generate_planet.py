@@ -1,4 +1,4 @@
-# planet_generator/generate_planet.py
+# /planet_generator/generate_planet.py
 
 from planet_generator.planet_config import PLANET_CONFIG
 from planet_generator.geometry.icosphere import IcosphereGenerator
